@@ -1,87 +1,49 @@
-require('dotenv').config(); // Charger les variables d'environnement depuis le fichier .env
-const { getAllSubscriptions } = require('../../services/subscription.service');
-const MonetBil = require('../MonetBil'); // Importer le module MonetBil
+require('dotenv').config();
+const { getChat, getImage } = require('../openAI/openAI'); // Assurez-vous d'importer correctement les fonctions OpenAI
 
 const welcomeStatusUser = {};
-const subscribeKeyword = 'subscribe';
+const imageKeyword = "imagine"
 
 const UserCommander = async (msg, transactionSteps) => {
-    if (!welcomeStatusUser[msg.from]) {
+  if (!welcomeStatusUser[msg.from]) {
+    // Envoyer le message de bienvenue la première fois
+    const welcomeMessage = `Bonjour ! Je suis LuzIA, ton assistante personnelle. Je suis là pour t'aider. Demande-moi des infos pour un voyage, un programme d'entraînement, ou comment prendre soin de tes plantes. Je peux même dessiner selon ton imagination !\n\nEssaye de me poser des questions par écrit ou par note vocale. Si tu veux que je te fasse un dessin, il suffit que tu commences la description par le mot *${imageKeyword}*. Tu peux aussi parler à l'un de mes amis en écrivant "amis", et tu pourras alors choisir de discuter avec Hermione, réviser tes cours d'anglais, et bien d'autres choses. \n\nN'oublie pas que je vise à m'améliorer tous les jours, donc même si certaines réponses sur des gens, lieux ou faits peuvent être imprécises ou obsolètes, je m'améliore constamment. Ta vie privée est notre priorité, donc ne partage aucune information personnelle avec moi.\n\nQu'est-ce que je peux faire pour toi aujourd'hui ? 🤗`;
+    msg.reply(welcomeMessage);
 
-        // Envoyer le message de bienvenue la première fois
-        const welcomeMessage = `🏆 Bienvenue sur PredictFoot ! 🌟\n\nPrêt à prédire les événements footballistiques passionnants ? Abonnez-vous dès maintenant en tapant *${subscribeKeyword}* pour accéder à nos prédictions premium. Ne manquez plus jamais un moment clé du jeu !\n\n⚽️ Rejoignez-nous et vivez le football autrement. Tapez simplement *${subscribeKeyword}* pour commencer.`;
-        msg.reply(welcomeMessage);
-  
-        // Enregistrer l'état de bienvenue pour cet utilisateur
-        welcomeStatusUser[msg.from] = true;
-      } else if (msg.body.toLowerCase() === subscribeKeyword && !msg.isGroupMsg) {
-  
-        if (msg.body.toLowerCase() === subscribeKeyword && !msg.isGroupMsg) {
-          const allSubscriptionsResponse = await getAllSubscriptions();
-          if (allSubscriptionsResponse.success) {
-            const subscriptions = allSubscriptionsResponse.subscriptions;
-            const replyMessage = 'Choisissez un forfait en répondant avec son numéro :\n' +
-              subscriptions.map((subscription, index) => {
-                return `${index + 1}. ${subscription.description}`;
-              }).join('\n');
-            msg.reply(replyMessage);
-          } else {
-            const replyMessage = 'Erreur lors de la récupération des forfaits.';
-            msg.reply(replyMessage);
-          }
-        }
-      } else if (/^\d+$/.test(msg.body) && transactionSteps[msg.from]?.step !== 'ask_phone_number') {
-        const allSubscriptionsResponse = await getAllSubscriptions();
-        if (allSubscriptionsResponse.success) {
-          const subscriptions = allSubscriptionsResponse.subscriptions;
-          const forfaits = subscriptions.map(subscription => subscription.price.toString());
-  
-          const selectedForfaitIndex = parseInt(msg.body) - 1;
-  
-          if (selectedForfaitIndex >= 0 && selectedForfaitIndex < forfaits.length) {
-            const selectedForfait = forfaits[selectedForfaitIndex];
-  
-            // Enregistrer l'étape de la transaction pour cet utilisateur
-            transactionSteps[msg.from] = { step: 'ask_phone_number', selectedForfait };
-  
-            const phoneNumberMessage = 'Veuillez entrer votre numéro de téléphone pour la transaction Mobile Money (ex: 6xxxxxxxx):';
-            msg.reply(phoneNumberMessage);
-          } else {
-            const invalidForfaitMessage = 'Le numéro de forfait sélectionné est invalide. Réessayez en fournissant un numéro valide.';
-            msg.reply(invalidForfaitMessage);
-          }
-        }
-      } else if (transactionSteps[msg.from]?.step === 'ask_phone_number') {
-        let phoneNumber = msg.body.replace(/\s+/g, ''); // Supprimer les espaces
-  
-        // Ajouter le préfixe +237 si nécessaire
-        if (!phoneNumber.startsWith('+237')) {
-          phoneNumber = '+237' + phoneNumber;
-        }
-  
-        // // Vérifier le format du numéro de téléphone
-        if (/^(?:\+237)?6(?:9|8|7|5)\d{7}$/.test(phoneNumber)) {
-          const allSubscriptionsResponse = await getAllSubscriptions();
-          const subscriptions = allSubscriptionsResponse.subscriptions;
-          const selectedForfait = transactionSteps[msg.from]?.selectedForfait;
-  
-          MonetBil.processPayment(msg, phoneNumber, selectedForfait, subscriptions, transactionSteps);
-        }
-        else if (/^(?:\+237)?6(?:6|2)\d{7}$/.test(phoneNumber)) {
-          const invalidPhoneNumberMessage = 'Veuillez entrer uniquement un numéro MTN ou Orange.';
-          msg.reply(invalidPhoneNumberMessage);
+    // Enregistrer l'état de bienvenue pour cet utilisateur
+    welcomeStatusUser[msg.from] = true;
+  } else {
+    // Si ce n'est pas la première interaction, vérifiez si l'utilisateur a demandé de générer une image
+    const text = msg.body.toLowerCase(); // Vous pouvez adapter cette partie en fonction de la structure de votre message
+    if (text.includes(imageKeyword)) {
+      // L'utilisateur a demandé de générer une image, extrayez la description après "imagine"
+      const description = text.split(imageKeyword)[1].trim();
+
+      if (description) {
+        // envoyer un message d'attente"
+        msg.reply("Je suis au labo, un instant... 👩‍🎨 🎨 🖼");
+
+        // Utilisez la fonction getImage pour générer l'image en fonction de la description
+        const imageUrl = await getImage(description);
+        if (imageUrl) {
+          // Répondez à l'utilisateur avec l'image générée sans texte supplémentaire
+          msg.reply({ url: imageUrl });
         } else {
-          const invalidPhoneNumberMessage = 'Le numéro de téléphone est invalide. Veuillez saisir un numéro de téléphone au format valide (ex: 6xxxxxxxx).';
-          msg.reply(invalidPhoneNumberMessage); 
-        } 
-      } else {
-        const invalidRequestMessage = `Je ne comprends pas votre requête. Abonnez-vous dès maintenant en tapant *${subscribeKeyword}* pour accéder à nos prédictions premium.`;
-        msg.reply(invalidRequestMessage); 
+          // En cas d'erreur lors de la génération de l'image
+          msg.reply("Désolé, je n'ai pas pu générer l'image pour cette description.");
+        }
       }
+    } else {
+      // Si l'utilisateur n'a pas demandé de générer une image, obtenez une réponse de l'IA en utilisant la fonction getChat
+      const chatResponse = await getChat(text);
+      if (chatResponse) {
+        // Répondez à l'utilisateur avec la réponse de l'IA
+        msg.reply(chatResponse);
+      }
+    }
+  }
 };
 
-
-
 module.exports = {
-    UserCommander,
+  UserCommander,
 };
