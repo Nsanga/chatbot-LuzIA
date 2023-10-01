@@ -14,8 +14,8 @@ const getImage = async (text) => {
       n: 1,
       size: "512x512",
     });
-
-    return response.data.data[0].url;
+console.log(':::',response)
+    return response.data[0].url;
   } catch (error) {
     logger.error("Error while generating image");
   }
@@ -51,7 +51,7 @@ const getChat = async (text) => {
     return response.choices[0].message.content;
   } catch (error) {
     console.log(error);
-    logger.error("Error while generating Answer");
+    logger.error("Error while generating Answer"); 
   }
 };
 
