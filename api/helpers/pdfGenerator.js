@@ -8,13 +8,13 @@ async function generatePDFBuffer(user,phone,idTransaction,forfait,operator,amoun
     const doc = new PDFDocument();
 
     // Load the watermark image
-    const watermarkResponse = await axios.get('https://res.cloudinary.com/nwccompany/image/upload/v1691058952/PredictFoot_icon_ib9dvl.png', {
+    const watermarkResponse = await axios.get('https://res.cloudinary.com/dmfjhas5a/image/upload/v1696281554/watermark_kl7nvs.png', {
       responseType: 'arraybuffer' // Set response type to 'arraybuffer'
     });
     const watermarkImage = Buffer.from(watermarkResponse.data);
 
     // Load the logo image
-    const logoResponse = await axios.get("https://res.cloudinary.com/nwccompany/image/upload/v1691058974/PredictFoot_logo_2x-100_ikyqby.jpg", {
+    const logoResponse = await axios.get("https://res.cloudinary.com/dmfjhas5a/image/upload/v1696281739/SK-IA_amvr1a.png", {
       responseType: 'arraybuffer' // Set response type to 'arraybuffer'
     });
     const logoImage = Buffer.from(logoResponse.data);

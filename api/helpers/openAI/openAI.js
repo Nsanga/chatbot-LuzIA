@@ -23,26 +23,11 @@ console.log(':::',response)
 // Generate answer from prompt
 const getChat = async (text) => {
   try {
-    let systemMessage = ""; // Initialisation du message système
-
-    // Convertir le texte de l'utilisateur en minuscules pour faciliter la détection
-    const lowerCaseUserText = text.toLowerCase(); 
-
-    // Détection de la question sur le nom du système
-    if (
-      lowerCaseUserText.includes("comment tu t'appelles") || 
-      lowerCaseUserText.includes("qui es-tu") ||
-      lowerCaseUserText.includes("quel est ton nom")
-    ) {
-      systemMessage = "Je m'appelle SKIA, votre assistante personnelle.";
-    } else {
-      // Message système générique
-      systemMessage = "Vous êtes en train de discuter avec un assistant intelligent.";
-    }
-
     const response = await openai.chat.completions.create({
       messages: [
-        { role: "system", content: systemMessage },
+        { role: "system", content: "You are SKIA, a large language model trained by OpenAI. Answer as concisely as possible." },
+        { role: "user", content: text },
+        { role: "assistant", content: "I am doing well" },
         { role: "user", content: text },
       ],
       model: "gpt-3.5-turbo",
