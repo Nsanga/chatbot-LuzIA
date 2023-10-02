@@ -10,7 +10,7 @@ async function handlePaymentSuccess(req, res , client) {
       const dateSubscription = moment().format('YYYY-MM-DD');
       const expirationDate = dateSubscription.add(first_name, 'days');
       // Créez un message de succès
-      const successMessage = `Félicitations ! Votre paiement pour le forfait ${item_ref} a été effectué avec succès. Profitez de nos services premium ! Ci-joint la facture de paiement du forfait.`;
+      const successMessage = `Félicitations ! Votre paiement pour le forfait ${item_ref} a été effectué avec succès. Profitez de nos services premium avec SKIA ! Ci-joint la facture de paiement du forfait.`;
       // Envoyez le message de succès au destinataire
       await sendMessageToNumber(client ,req.body.user, successMessage);
     

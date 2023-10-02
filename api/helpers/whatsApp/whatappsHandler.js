@@ -2,7 +2,6 @@ require('dotenv').config(); // Load environment variables from the .env file
 const { Client } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const { userExistAndSubscribe } = require('../../services/user.service');
-const {AdminCommander} = require("./admin");
 const {UserCommander} = require("./user");
 
 
@@ -33,10 +32,7 @@ const handleIncomingMessages = (client) => {
   client.on('message', async (msg) => {
     const isSubscribe = await userExistAndSubscribe(msg.from);
     if (isSubscribe.success && !msg.isGroupMsg && msg.from != process.env.NUMBER_ADMIN) {
-      msg.reply("Étant déjà abonné à l'un de nos forfaits en cours, saisissez l'occasion de tirer parti de nos pronostics VIP pour remporter d'importants gains.");
-    }
-    else if (msg.from == process.env.NUMBER_ADMIN && !msg.isGroupMsg) {
-    await AdminCommander(client,msg,transactionSteps);
+      msg.reply("Étant déjà abonné à l'un de nos forfaits en cours, continuez à profiter de nos service premium.");
     }
     else {
     await UserCommander(msg,transactionSteps);

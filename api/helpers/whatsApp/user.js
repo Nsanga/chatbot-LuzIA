@@ -29,9 +29,9 @@ const UserCommander = async (msg, transactionSteps) => {
     if (messageCount >= 6) {
 
       const text = msg.body.toLowerCase();
-      if (text === subscribeKeyword && !msg.isGroupMsg) {
+      if (text.includes(subscribeKeyword) && !msg.isGroupMsg) {
   
-        if (text === subscribeKeyword && !msg.isGroupMsg) {
+        if (text.includes(subscribeKeyword) && !msg.isGroupMsg) {
           const allSubscriptionsResponse = await getAllSubscriptions();
           if (allSubscriptionsResponse.success) {
             const subscriptions = allSubscriptionsResponse.subscriptions;
@@ -48,13 +48,11 @@ const UserCommander = async (msg, transactionSteps) => {
       } else if (/^\d+$/.test(msg.body) && transactionSteps[msg.from]?.step !== 'ask_phone_number') {
         const allSubscriptionsResponse = await getAllSubscriptions();
         if (allSubscriptionsResponse.success) {
-          const subscriptions = allSubscriptionsResponse.subscriptions;
-          const forfaits = subscriptions.map(subscription => subscription.price.toString());
-  
+          const subscriptions = allSubscriptionsResponse.subscriptions;  
           const selectedForfaitIndex = parseInt(msg.body) - 1;
   
-          if (selectedForfaitIndex >= 0 && selectedForfaitIndex < forfaits.length) {
-            const selectedForfait = forfaits[selectedForfaitIndex];
+          if (selectedForfaitIndex >= 0 && selectedForfaitIndex < subscriptions.length) {
+            const selectedForfait = subscriptions[selectedForfaitIndex];
   
             // Enregistrer l'étape de la transaction pour cet utilisateur
             transactionSteps[msg.from] = { step: 'ask_phone_number', selectedForfait };
@@ -80,7 +78,7 @@ const UserCommander = async (msg, transactionSteps) => {
           const subscriptions = allSubscriptionsResponse.subscriptions;
           const selectedForfait = transactionSteps[msg.from]?.selectedForfait;
   
-          MonetBil.processPayment(msg, phoneNumber, selectedForfait, subscriptions, transactionSteps);
+          MonetBil.processPayment(msg, phoneNumber, selectedForfait, transactionSteps);
         }
         else if (/^(?:\+237)?6(?:6|2)\d{7}$/.test(phoneNumber)) {
           const invalidPhoneNumberMessage = 'Veuillez entrer uniquement un numéro MTN ou Orange.';

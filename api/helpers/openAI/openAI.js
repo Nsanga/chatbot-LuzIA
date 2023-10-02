@@ -26,7 +26,7 @@ const getChat = async (text) => {
     let systemMessage = ""; // Initialisation du message système
 
     // Convertir le texte de l'utilisateur en minuscules pour faciliter la détection
-    const lowerCaseUserText = text.toLowerCase();
+    const lowerCaseUserText = text.toLowerCase(); 
 
     // Détection de la question sur le nom du système
     if (
@@ -34,7 +34,7 @@ const getChat = async (text) => {
       lowerCaseUserText.includes("qui es-tu") ||
       lowerCaseUserText.includes("quel est ton nom")
     ) {
-      systemMessage = "Je m'appelle LuzIA, votre assistante personnelle.";
+      systemMessage = "Je m'appelle SKIA, votre assistante personnelle.";
     } else {
       // Message système générique
       systemMessage = "Vous êtes en train de discuter avec un assistant intelligent.";
