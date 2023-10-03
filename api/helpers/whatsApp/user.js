@@ -14,7 +14,7 @@ const messageCountMap = new Map();
 const UserCommander = async (msg, transactionSteps) => {
   if (!welcomeStatusUser[msg.from]) {
     // Envoyer le message de bienvenue la première fois
-    const welcomeMessage = `Salut et Bienvenue dans l'univers de SKIA votre nouvel ami virtuel sur WhatsApp 🤖✨! \n\nJe suis ravi de vous accueillir en tant que nouvel utilisateur. Préparez-vous à vivre des conversations passionnantes, à poser des questions et à explorer un monde de connaissances. \n\n Cependant, rappelez-vous qu'il y a un nombre limité de messages gratuits que vous pouvez envoyer. Une fois cette limite atteinte, ne vous inquiétez pas, vous pourrez souscrire à notre abonnement pour continuer à profiter de conversations enrichissantes et de fonctionnalités avancées. N'hésitez pas à explorer toutes les possibilités à portée de main et à découvrir comment SKIA peut rendre votre expérience sur WhatsApp plus agréable et productive. \n\n Si vous avez besoin d'aide à tout moment, il vous suffit de me contacter. Prêt à commencer cette aventure passionnante avec SKIA ? 💬🤗  \n\n comment je peux vous aider aujourd'hui?`;
+    const welcomeMessage = `👋 Hi there! I'm SKIA, your favorite virtual assistant 🤖. I'm here to help you! 🌟\n\nTo start with, enjoy unlimited free messages from me. 🆓 You can also trigger image generation by beginning your sentence with *${imageKeyword}* 🖼.\n\nHowever, once you reach the free limit, it's time to level up! 😎 To continue enjoying my outstanding services, you can subscribe to our premium plan. 💼\n\nRemember, I'm here to answer all your questions and assist you with your tasks. So, how can I assist you today? 💬🤗`;
     msg.reply(welcomeMessage);
 
     // Enregistrer l'état de bienvenue pour cet utilisateur
@@ -35,13 +35,13 @@ const UserCommander = async (msg, transactionSteps) => {
           const allSubscriptionsResponse = await getAllSubscriptions();
           if (allSubscriptionsResponse.success) {
             const subscriptions = allSubscriptionsResponse.subscriptions;
-            const replyMessage = 'Choisissez un forfait en répondant avec son numéro :\n' +
+            const replyMessage = 'Choose a package by responding with its number :\n' +
               subscriptions.map((subscription, index) => {
                 return `${index + 1}. ${subscription.description}`;
               }).join('\n');
             msg.reply(replyMessage);
           } else {
-            const replyMessage = 'Erreur lors de la récupération des forfaits.';
+            const replyMessage = 'Error while retrieving the packages.';
             msg.reply(replyMessage);
           }
         }
@@ -57,10 +57,10 @@ const UserCommander = async (msg, transactionSteps) => {
             // Enregistrer l'étape de la transaction pour cet utilisateur
             transactionSteps[msg.from] = { step: 'ask_phone_number', selectedForfait };
   
-            const phoneNumberMessage = 'Veuillez entrer votre numéro de téléphone pour la transaction Mobile Money (ex: 6xxxxxxxx):';
+            const phoneNumberMessage = 'Please enter your phone number for the Mobile Money transaction (ex: 6xxxxxxxx):';
             msg.reply(phoneNumberMessage);
           } else {
-            const invalidForfaitMessage = 'Le numéro de forfait sélectionné est invalide. Réessayez en fournissant un numéro valide.';
+            const invalidForfaitMessage = 'The selected package number is invalid. Please retry with a valid number.';
             msg.reply(invalidForfaitMessage);
           }
         }
@@ -81,15 +81,15 @@ const UserCommander = async (msg, transactionSteps) => {
           MonetBil.processPayment(msg, phoneNumber, selectedForfait, transactionSteps);
         }
         else if (/^(?:\+237)?6(?:6|2)\d{7}$/.test(phoneNumber)) {
-          const invalidPhoneNumberMessage = 'Veuillez entrer uniquement un numéro MTN ou Orange.';
+          const invalidPhoneNumberMessage = 'Please enter only an MTN or Orange number.';
           msg.reply(invalidPhoneNumberMessage);
         } else {
-          const invalidPhoneNumberMessage = 'Le numéro de téléphone est invalide. Veuillez saisir un numéro de téléphone au format valide (ex: 6xxxxxxxx).';
+          const invalidPhoneNumberMessage = 'The phone number is invalid. Please enter a valid phone number format (ex: 6xxxxxxxx).';
           msg.reply(invalidPhoneNumberMessage); 
         } 
       } else {
         // L'utilisateur a atteint la limite de messages gratuits
-        const invalidRequestMessage = `vous avez attient votre quota journalier🤖 \n\n Nous sommes ravis de vous compter parmis nos utilisateur. Pour débloquer un accèss illimité à nos contenu premium et bénéficier d'une expérience exceptionnelle, veuillez saisir *${subscribeKeyword}* . `;
+        const invalidRequestMessage = `You have reached your daily quota 🤖.\n\nWe are delighted to have you as one of our users. To unlock unlimited access to our premium content and enjoy an exceptional experience, please enter *${subscribeKeyword}* . `;
         msg.reply(invalidRequestMessage); 
       } 
 
@@ -101,7 +101,7 @@ const UserCommander = async (msg, transactionSteps) => {
         const imageUrl = await getImage(text);
 
         if (text) {
-          msg.reply("Je suis au labo, un instant... 👩‍🎨 🎨 🖼");
+          msg.reply(`I'm in the lab, just a moment... 👩‍🎨 🎨 🖼`);
           
           const result = await MessageMedia.fromUrl(imageUrl);
           if (result) {
