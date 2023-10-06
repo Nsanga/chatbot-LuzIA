@@ -47,7 +47,7 @@ client.initialize();
 
 
 // App Routes
-app.use('/api/v1/', appRoutes(client));   
+app.use('/', appRoutes(client));   
 
 // Custom 404 error handler 
 app.use((req, res, next) => {

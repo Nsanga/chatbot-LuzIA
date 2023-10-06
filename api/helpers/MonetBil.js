@@ -7,8 +7,10 @@ async function processPayment(msg, phoneNumber, selectedForfait, transactionStep
     amount: "1", 
     // selectedForfait?.price,
     user: msg.from.replace(/@c\.us$/, ""),
-    first_name: selectedForfait?.durationInDays,
+    first_name: selectedForfait?.durationInDays, 
+    last_name:"SKIA",
     item_ref: selectedForfait?.name,
+
   };
 
   const apiEndpoint = process.env.PAYMENT_API_ENDPOINT;
